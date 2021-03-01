@@ -1,0 +1,127 @@
+﻿@{
+    ViewBag.Title = "Part Master";
+}
+
+<h2>Part Master</h2>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" onclick="Clear();">
+    Create
+</button>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Part Master</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="col-md-6">
+                        <label class="col-md-2 control-label">Part ID</label>
+                        <div class="col-md-10">
+                            <input class="form-control" type="text" id="PartID" name="PartID" onchange="Get()" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-md-2 control-label">Part Name</label>
+                        <div class="col-md-10">
+                            <input class="form-control" type="text" id="PartName" name="PartName" />
+                        </div>
+                    </div>
+                </div>
+               
+                @*<div>
+                    <label class="col-md-2 control-label">Price</label>
+                    <div class="col-md-10">
+                        <input class="form-control" type="number" id="Price" name="Price" value="0" onchange="Calculate();" />
+                    </div>
+                </div>
+                <div>
+                    <label class="col-md-2 control-label">Quantity</label>
+                    <div class="col-md-10">
+                        <input class="form-control" type="number" id="Quantity" value="0" name="Quantity" onchange="Calculate();" />
+                    </div>
+                </div>
+                <div>
+                    <label class="col-md-2 control-label">Amount</label>
+                    <div class="col-md-10">
+                        <input class="form-control" type="text" id="Amount" name="Amount" disabled />
+                    </div>
+                </div>
+                <div>
+                    <div class="col-md-10">
+                        <input class="form-control" type="text" id="Message" name="Message" disabled />
+                    </div>
+                </div>*@
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" style="float:left">Close</button>
+                <button type="button" class="btn btn-primary" onclick="Save();" id="submit">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        function Save() {
+            let data = new Object();
+            data.partid = $("#PartID").val();
+            data.partName = $("#PartName").val();
+            data.price = $("#Price").val();
+            data.quantity = $("#Quantity").val();
+            data.amount = $("#Amount").val();
+            if ($("#PartID").val().length > 4 || $("#PartName").val().length > 25 || $("#Price").val().length > 10 || $("#Quantity").val().length > 4) {
+                window.alert("reach max length");
+            }
+            else {
+                $.ajax({
+                    url: "/Home/Post/",
+                    data: { partMaster: data },
+                    type: "POST"
+                }).done(function (result) {
+                    if (result > 0) {
+                        $("#Message").val("Data saved successfully")
+                    }
+                }).fail(function (error) {
+                    $("#Message").val("Data failed to saved")
+                })
+            }
+        }
+
+        function Calculate() {
+            let price = $("#Price").val();
+            let quantity = $("#Quantity").val();
+            console.log(price, quantity);
+            if (price != 0 || quantity != 0) {
+                $("#Amount").val(price * quantity);
+            } else {
+                $("#Amount").val(price * quantity);
+            }
+        }
+
+        function Get() {
+            let id = $("#PartID").val();
+            $.ajax({
+                url: "/Home/Get/",
+                data: { id: id }
+            }).done(function () {
+                window.alert("id duplicate")
+                $("#submit").prop("disabled", true);
+            }).fail(function (error) {
+                $("#submit").prop("disabled", false);
+            })
+        }
+
+        function Clear() {
+            $("#PartID").val("");
+            $("#PartName").val("");
+            $("#Price").val(0);
+            $("#Quantity").val(0);
+            $("#Amount").val(0);
+        }
+    </script>
+} 
